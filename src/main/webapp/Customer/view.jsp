@@ -8,16 +8,26 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Xem chi tiet khach hang</title>
+    <title>View Customer</title>
 </head>
 <body>
-<table border="1">
+<h1>Customer details</h1>
+<p>
+    <a href="/customers">Back to customer list</a>
+</p>
+<table>
     <tr>
-    <td>${co.name}</td>
-    <td>${co.email}</td>
-    <td>${co.address}</td>
-</tr>
+        <td>Name: </td>
+        <td>${requestScope["customer3"].getName()}</td>
+    </tr>
+    <tr>
+        <td>Email: </td>
+        <td>${requestScope["customer3"].getEmail()}</td>
+    </tr>
+    <tr>
+        <td>Address: </td>
+        <td>${requestScope["customer3"].getAddress()}</td>
+    </tr>
 </table>
-
 </body>
 </html>

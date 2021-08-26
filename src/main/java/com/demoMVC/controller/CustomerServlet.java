@@ -31,9 +31,6 @@ public class CustomerServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
-    private void createCustomer(HttpServletRequest request, HttpServletResponse response){
-
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -43,13 +40,16 @@ public class CustomerServlet extends HttpServlet {
         }
         switch (action){
             case "create":
+                showCreateForm(req, resp);
                 break;
             case "edit":
+                showEditForm(req,resp);
                 break;
             case "delete":
+                showDeleteForm(req,resp);
                 break;
             case "view":
-                findByID(req,resp);
+                viewCustomer(req,resp);
                 break;
             default:
                 listCustomers(req, resp);
@@ -57,20 +57,59 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    private void findByID(HttpServletRequest req, HttpServletResponse resp) {
-        String id = req.getParameter("id");
-        int id1 = Integer.parseInt(id);
-        Customer customer2 = customerService.findById(id1);
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("Customer/view.jsp");
-        req.setAttribute("co", customer2);
+    private void viewCustomer(HttpServletRequest req, HttpServletResponse resp) {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Customer customer = customerService.findById(id);
+        req.setAttribute("customer3", customer);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/view.jsp");
         try {
-            requestDispatcher.forward(req,resp);
+            dispatcher.forward(req,resp);
         } catch (ServletException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private void showDeleteForm(HttpServletRequest req, HttpServletResponse resp) {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Customer customer = customerService.findById(id);
+        req.setAttribute("customer2", customer);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/delete.jsp");
+        try {
+            dispatcher.forward(req,resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showEditForm(HttpServletRequest req, HttpServletResponse resp) {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Customer customer = customerService.findById(id);
+        req.setAttribute("customer", customer);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/edit.jsp");
+        try {
+            dispatcher.forward(req,resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showCreateForm(HttpServletRequest req, HttpServletResponse resp) {
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/create.jsp");
+        try {
+            dispatcher.forward(req,resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -80,13 +119,68 @@ public class CustomerServlet extends HttpServlet {
         }
         switch (action){
             case "create":
+                createCustomer(req,resp);
                 break;
             case "edit":
+                updateCustomer(req, resp);
                 break;
             case "delete":
+                deleteCustomer(req,resp);
                 break;
             default:
                 break;
+        }
+    }
+
+    private void deleteCustomer(HttpServletRequest req, HttpServletResponse resp) {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Customer customer = customerService.findById(id);
+        customerService.remove(id);
+        try {
+            resp.sendRedirect("/customers");//chuyen huong den 1 URL khac
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateCustomer(HttpServletRequest req, HttpServletResponse resp) {
+        int id = Integer.parseInt(req.getParameter("id"));
+        String name = req.getParameter("name");
+        String email = req.getParameter("email");
+        String address = req.getParameter("address");
+        Customer customer = customerService.findById(id);
+        customer.setName(name);
+        customer.setEmail(email);
+        customer.setAddress(address);
+        customerService.update(id, customer);
+        req.setAttribute("customer", customer);
+        req.setAttribute("message", "Customer information was updated");
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/edit.jsp");
+        try {
+            dispatcher.forward(req,resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void createCustomer(HttpServletRequest req, HttpServletResponse resp) {
+        String name = req.getParameter("name");
+        String email = req.getParameter("email");
+        String address = req.getParameter("address");
+        int id = (int)(Math.random() * 10000);
+        Customer customer = new Customer(id,name, email, address);
+        customerService.save(customer);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("Customer/create.jsp");
+        req.setAttribute("message","New customer was created");
+        try {
+            dispatcher.forward(req,resp);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
